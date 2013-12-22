@@ -80,7 +80,7 @@ namespace QUSMAML
             Clusters = new List<int>();
 
             //calculate all the distances
-            _distances = new double[inputs.Count(), inputs.Count()];
+            _distances = new double[inputs.Count, inputs.Count];
 
             for (int i = 0; i < inputs.Count - 1; i++)
             {
@@ -94,18 +94,7 @@ namespace QUSMAML
             _medoids = Enumerable.Range(1, k).Select(x => -1).ToArray();
 
             //initialization
-            //TODO need a smarter way of initializing
-            var r = new Random();
-            for (int i = 0; i < k; i++)
-            {
-                int medoidIndex;
-                do
-                {
-                    medoidIndex = r.Next(0, inputs.Count);
-
-                } while (_medoids.Contains(medoidIndex));
-                _medoids[i] = medoidIndex;
-            }
+            InitializeMedoids(inputs, k);
 
             //loop until no further improvement is made
             bool stop = false;
@@ -124,6 +113,57 @@ namespace QUSMAML
 
             //finally get the clusters from the current medoids
             UpdateClusters(inputs);
+        }
+
+        /// <summary>
+        /// A deterministic approach to initialization. 
+        /// Follows Park et al (http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.90.7981&rep=rep1&type=pdf) for the first medoid.
+        /// Then picks medoids on the basis of maximum differene from the already existing ones.
+        /// </summary>
+        private void InitializeMedoids(List<T> inputs, int k)
+        {
+            double[] distanceSums = new double[inputs.Count];
+            double[,] p = new double[inputs.Count, inputs.Count];
+            double[] pSum = new double[inputs.Count];
+            for (int i = 0; i < inputs.Count; i++)
+            {
+                for (int j = 0; j < inputs.Count; j++)
+                {
+                    distanceSums[i] += _distances[i, j];
+                }
+            }
+
+            for (int i = 0; i < inputs.Count; i++)
+            {
+                for (int j = 0; j < inputs.Count; j++)
+                {
+                    p[i, j] += _distances[i, j] / distanceSums[i];
+                }
+            }
+
+            for (int i = 0; i < inputs.Count; i++)
+            {
+                for (int j = 0; j < inputs.Count; j++)
+                {
+                    pSum[i] += p[j, i];
+                }
+            }
+
+            _medoids[0] = Array.IndexOf(pSum, pSum.Min());
+            
+            //we have the first medoid, now simply select new ones on the basis of maximum distance from the existing ones
+            for (int i = 1; i < k; i++)
+            {
+                double[] medoidDistanceSums = new double[inputs.Count];
+                for (int j = 0; j < i; j++)
+                {
+                    for (int l = 0; l < inputs.Count; l++)
+                    {
+                        medoidDistanceSums[l] += _distances[l, _medoids[j]];
+                    }
+                }
+                _medoids[i] = Array.IndexOf(medoidDistanceSums, medoidDistanceSums.Max());
+            }
         }
 
         /// <summary>
