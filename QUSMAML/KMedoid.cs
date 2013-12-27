@@ -98,11 +98,9 @@ namespace QUSMAML
 
             //loop until no further improvement is made
             bool stop = false;
-            double lastTotalCost = double.MaxValue;
+            double lastTotalCost = TotalCost(_medoids, ref inputs);
             while (!stop)
             {
-
-
                 //for each medoid, we try replacing it with a nonmedoid
                 //if the total score improves, we keep the change
                 bool changed;
@@ -213,6 +211,7 @@ namespace QUSMAML
                         return newMedoids;
                     }
                 }
+                newMedoids[i] = _medoids[i];
             }
 
             changed = false;
