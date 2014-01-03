@@ -47,7 +47,6 @@
 //  [11]0
 //  [12]0
 
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -97,16 +96,14 @@ namespace QUSMAML
             InitializeMedoids(inputs, k);
 
             //loop until no further improvement is made
-            bool stop = false;
+            bool changed = true;
             double lastTotalCost = TotalCost(_medoids, ref inputs);
-            while (!stop)
+            while (changed)
             {
                 //for each medoid, we try replacing it with a nonmedoid
                 //if the total score improves, we keep the change
-                bool changed;
-                _medoids = GetNewMedoids(k, ref inputs, ref lastTotalCost, out changed);
 
-                if (!changed) stop = true;
+                _medoids = GetNewMedoids(k, ref inputs, ref lastTotalCost, out changed);
             }
 
             //finally get the clusters from the current medoids
@@ -114,7 +111,7 @@ namespace QUSMAML
         }
 
         /// <summary>
-        /// A deterministic approach to initialization. 
+        /// A deterministic approach to initialization.
         /// Follows Park et al (http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.90.7981&rep=rep1&type=pdf) for the first medoid.
         /// Then picks medoids on the basis of maximum differene from the already existing ones.
         /// </summary>
@@ -148,7 +145,7 @@ namespace QUSMAML
             }
 
             _medoids[0] = Array.IndexOf(pSum, pSum.Min());
-            
+
             //we have the first medoid, now simply select new ones on the basis of maximum distance from the existing ones
             for (int i = 1; i < k; i++)
             {
@@ -219,7 +216,7 @@ namespace QUSMAML
         }
 
         /// <summary>
-        /// Calculates the total cost given a set of points and medoids. 
+        /// Calculates the total cost given a set of points and medoids.
         /// Total cost is the sum of the minimum distances between each point and a medoid.
         /// </summary>
         private double TotalCost(int[] medoids, ref List<T> inputs)
