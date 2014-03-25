@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DBA.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="KMedoid.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
