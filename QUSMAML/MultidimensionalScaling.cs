@@ -5,6 +5,12 @@ namespace QUSMAML
 {
     public static class MultidimensionalScaling
     {
+        /// <summary>
+        /// Multidimensional scaling/PCoA: transform distances to points in a coordinate system.
+        /// </summary>
+        /// <param name="input">A matrix of pairwise distances. Zero indicates identical objects.</param>
+        /// <returns>A matrix, the columns of which are coordinates in the nth dimension. 
+        /// The rows are in the same order as the input.</returns>
         public static ILArray<double> Scale(ILArray<double> input)
         {
             int n = input.Length;
